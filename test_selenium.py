@@ -10,13 +10,14 @@ test_data = [
     {"skills": "QA Automation", "exp": "3 years", "location": "Gurugram"},
     {"skills": "Data Analyst", "exp": "1 year", "location": "Delhi / NCR"}
 ]
-
 driver = webdriver.Chrome()
 driver.maximize_window()
 wait = WebDriverWait(driver, 15)
 
 
 for data in test_data:
+        print(f"\nSearching for: {data['skills']} | {data['exp']} | {data['location']}")
+        
         driver.get("https://www.naukri.com/")
 
         
@@ -31,13 +32,13 @@ for data in test_data:
         exp_dropdown = wait.until(EC.element_to_be_clickable(
             (By.XPATH, "//*[contains(@placeholder, 'Select experience') or contains(text(), 'Select experience') or contains(@id, 'expWD')]")
         ))
-        driver.execute_script("arguments[0].click();", exp_dropdown)
+        exp_dropdown.click()
 
         
         exp_opt = wait.until(EC.element_to_be_clickable(
             (By.XPATH, f"//span[contains(text(), '{data['exp']}')]")
         ))
-        driver.execute_script("arguments[0].click();", exp_opt)
+        exp_opt.click()
 
        
         loc_field = wait.until(EC.element_to_be_clickable(
@@ -51,7 +52,6 @@ for data in test_data:
         search_btn = wait.until(EC.element_to_be_clickable(
             (By.XPATH, "//div[contains(@class, 'qsbSubmit')]")
         ))
-        driver.execute_script("arguments[0].click();", search_btn)
-
+        search_btn.click()
         
 driver.quit()
