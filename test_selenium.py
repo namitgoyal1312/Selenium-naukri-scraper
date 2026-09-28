@@ -10,24 +10,18 @@ test_data = [
     {"skills": "QA Automation", "exp": "3 years", "location": "Gurugram"},
     {"skills": "Data Analyst", "exp": "1 year", "location": "Delhi / NCR"}
 ]
-options = webdriver.ChromeOptions()
-options.add_argument("--start-maximized")
-options.add_argument("--disable-notifications")
-driver = webdriver.Chrome(options=options)
+
+driver = webdriver.Chrome()
+driver.maximize_window()
 wait = WebDriverWait(driver, 15)
 
-all_results = []
 
-try:
-    for data in test_data:
-        
-      
+for data in test_data:
         driver.get("https://www.naukri.com/")
-        time.sleep(2)
 
         
         skill_field = wait.until(EC.element_to_be_clickable(
-            (By.XPATH, "//input[contains(@placeholder, 'Enter skills')]")
+            (By.XPATH, "//input[contains(@placeholder, 'Enter skills') or contains(@class, 'suggestor-input')]")
         ))
         skill_field.click()
         skill_field.clear()
@@ -35,20 +29,19 @@ try:
 
         
         exp_dropdown = wait.until(EC.element_to_be_clickable(
-            (By.XPATH, "//*[, 'Select experience')]")
+            (By.XPATH, "//*[contains(@placeholder, 'Select experience') or contains(text(), 'Select experience') or contains(@id, 'expWD')]")
         ))
-        exp_dropdown.click()
-        time.sleep(1)
+        driver.execute_script("arguments[0].click();", exp_dropdown)
 
         
-        exp_option = wait.until(EC.element_to_be_clickable(
-            (By.XPATH, f"")
+        exp_opt = wait.until(EC.element_to_be_clickable(
+            (By.XPATH, f"//span[contains(text(), '{data['exp']}')]")
         ))
-        exp_option.click()
+        driver.execute_script("arguments[0].click();", exp_opt)
 
-        
+       
         loc_field = wait.until(EC.element_to_be_clickable(
-            (By.XPATH, ", 'Enter location')]")
+            (By.XPATH, "//input[contains(@placeholder, 'Enter location')]")
         ))
         loc_field.click()
         loc_field.clear()
@@ -56,36 +49,9 @@ try:
 
         
         search_btn = wait.until(EC.element_to_be_clickable(
-            (By.XPATH, "")
+            (By.XPATH, "//div[contains(@class, 'qsbSubmit')]")
         ))
-        # JavaScript click handles overlays or sticky headers reliably
         driver.execute_script("arguments[0].click();", search_btn)
 
-       
-        time.sleep(4)  # Allow results to render
-        job_cards = driver.find_elements(By.CSS_SELECTOR, "div.srp-jobtuple-wrapper, article.jobTuple")
-
-        if not job_cards:
-            print("No jobs found for this criteria.")
-        else:
-            # Capture up to top 5 job listings
-            for card in job_cards[:5]:
-                try:
-                    title = card.find_element(By.CSS_SELECTOR, "a.title").text
-                except:
-                    title = "N/A"
-                try:
-                    company = card.find_element(By.CSS_SELECTOR, "a.comp-name, a.subTitle").text
-                except:
-                    company = "N/A"
-
-                all_results.append({
-                    "Skill Query": data["skills"],
-                    "Exp Query": data["exp"],
-                    "Location Query": data["location"],
-                    "Job Title": title,
-                    "Company": company
-                })
-
-finally:
-    driver.quit()
+        
+driver.quit()
